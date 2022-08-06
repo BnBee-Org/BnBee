@@ -3,5 +3,6 @@
   <component name="VcsDirectoryMappings">
     <mapping directory="$PROJECT_DIR$" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/BnBee" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/BnBee-Org/BnBee" vcs="Git" />
   </component>
 </project>

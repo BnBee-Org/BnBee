@@ -1,5 +1,6 @@
 from contextlib import AbstractContextManager
 from datetime import datetime
+from pytz import timezone
 from typing import Callable, Iterator
 
 from sqlalchemy import func
@@ -52,7 +53,7 @@ class StatisticRepository:
         with self.session_factory() as session:
             stat = Statistics(hive_id=hive_id, temperature=temperature, humidity=humidity, weight=weight,
                               avr_sound=avr_sound, pressure=pressure,
-                              datetime=datetime.now())
+                              datetime=datetime.now(tz=timezone('Europe/Kiev')))
             session.add(stat)
             session.commit()
             session.refresh(stat)
