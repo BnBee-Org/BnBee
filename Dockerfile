@@ -11,5 +11,4 @@ RUN pip install --upgrade pip \
 && pip install -r requirements.txt \
  && pip install uvicorn[standard]
 
-
 CMD uvicorn webapp.application:app --host ${HOST} --port ${PORT}

@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, Response, status, Query
+from fastapi import APIRouter, Depends, Response, status
 from dependency_injector.wiring import inject, Provide
 
 from webapp.containers import Container
@@ -28,6 +28,18 @@ def get_by_id(
         return Response(status_code=status.HTTP_404_NOT_FOUND)
 
 
+@statistic_router.get("/statistic/{hive_id}/latest")
+@inject
+def get_by_id(
+        hive_id: int,
+        statistic_service: StatisticService = Depends(Provide[Container.statistic_service]),
+):
+    try:
+        return statistic_service.get_latest_stat_by_hive_id(hive_id)
+    except NotFoundError:
+        return Response(status_code=status.HTTP_404_NOT_FOUND)
+
+
 @statistic_router.get("/statistic/latest/{apiary_id}")
 @inject
 def get_by_id(
@@ -35,7 +47,7 @@ def get_by_id(
         statistic_service: StatisticService = Depends(Provide[Container.statistic_service]),
 ):
     try:
-        return statistic_service.get_latest_stat_by_apiary(apiary_id)
+        return statistic_service.get_latest_stat_by_apiary_id(apiary_id)
     except NotFoundError:
         return Response(status_code=status.HTTP_404_NOT_FOUND)
 
