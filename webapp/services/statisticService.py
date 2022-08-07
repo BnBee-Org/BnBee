@@ -18,8 +18,11 @@ class StatisticService:
     def get_statistic_by_date_range(self, hive_id: int, date_range: str) -> Statistics:
         return self._repository.get_by_date_range(hive_id, date_range)
 
-    def get_latest_stat_by_apiary(self, apiary_id: int) -> Statistics:
-        return self._repository.get_latest_stat_by_apiary(apiary_id)
+    def get_latest_stat_by_apiary_id(self, apiary_id: int) -> Statistics:
+        return self._repository.get_latest_stat_by_apiary_id(apiary_id)
+
+    def get_latest_stat_by_hive_id(self, hive_id: int) -> Statistics:
+        return self._repository.get_latest_stat_by_hive_id(hive_id)
 
     def create_statistic(self, hive_id: int, temperature: float, humidity: float, weight: float, avr_sound: float,
                          pressure: float) -> Statistics:
