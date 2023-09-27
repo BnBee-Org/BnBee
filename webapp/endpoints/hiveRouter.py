@@ -1,8 +1,9 @@
 from fastapi import APIRouter, Depends, Response, status
 from dependency_injector.wiring import inject, Provide
-
+from webapp.auth.auth_bearer import JWTBearer
 from webapp.containers import Container
 from webapp.repositories.notFoundError import NotFoundError
+
 from webapp.services.hiveService import HiveService
 
 hive_router = APIRouter()
@@ -28,15 +29,25 @@ def get_by_id(
         return Response(status_code=status.HTTP_404_NOT_FOUND)
 
 
+# @hive_router.post("/hives/login", tags=["user"])
+# async def user_login(email: str):
+#     if True:
+#         return signJWT(email)
+#     return {
+#         "error": "Wrong login details!"
+#     }
+
+
 @hive_router.post("/hives", status_code=status.HTTP_201_CREATED)
 @inject
 def add(
         hive_name: str,
         is_active: bool,
         apiary_id: int,
+        user: str = Depends(JWTBearer()),
         hive_service: HiveService = Depends(Provide[Container.hive_service]),
 ):
-    return hive_service.create_hive(hive_name, is_active, apiary_id)
+    return hive_service.create_hive(hive_name, is_active, apiary_id, user)
 
 
 @hive_router.patch("/hives/{hive_id}", status_code=status.HTTP_201_CREATED)

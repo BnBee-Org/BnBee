@@ -1,4 +1,4 @@
-from sqlalchemy import Column, String, Boolean, Integer
+from sqlalchemy import Column, String, Boolean, Integer, ForeignKey
 
 from webapp.database import Base
 
@@ -7,6 +7,7 @@ class Hive(Base):
     __tablename__ = 'hive'
 
     id = Column(Integer, primary_key=True)
+    organization_id = Column(Integer, ForeignKey('organization.id'))
     name = Column(String)
     bee_count = Column(Integer)
     is_active = Column(Boolean)

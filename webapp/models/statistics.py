@@ -1,4 +1,4 @@
-from sqlalchemy import Column, String, Boolean, Integer, DateTime, Float, ForeignKey
+from sqlalchemy import Column, Integer, DateTime, Float, ForeignKey
 
 from webapp.database import Base
 
@@ -8,6 +8,7 @@ class Statistics(Base):
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     hive_id = Column(Integer, ForeignKey('hive.id'))
+    organization_id = Column(Integer, ForeignKey('organization.id'))
     datetime = Column(DateTime)
     temperature = Column(Float)
     humidity = Column(Float)

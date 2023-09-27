@@ -15,8 +15,8 @@ class HiveService:
     def get_hive_by_id(self, hive_id: int) -> Hive:
         return self._repository.get_by_id(hive_id)
 
-    def create_hive(self, hive_name: str, is_active: bool, apiary_id: int) -> Hive:
-        return self._repository.add(name=hive_name, is_active=is_active, apiary_id=apiary_id)
+    def create_hive(self, hive_name: str, is_active: bool, apiary_id: int, user: str) -> Hive:
+        return self._repository.add(name=hive_name, is_active=is_active, apiary_id=apiary_id, user=user)
 
     def update_hive(self, hive_id: int, hive_name: str, bee_count: int, is_active: bool, lid_open: bool,
                     door_open: bool,
