@@ -1,4 +1,4 @@
-from uuid import uuid4
+# from uuid import uuid4
 from typing import Iterator
 
 from webapp.models.user import User
@@ -16,9 +16,13 @@ class UserService:
     def get_user_by_id(self, user_id: int) -> User:
         return self._repository.get_by_id(user_id)
 
-    def create_user(self) -> User:
-        uid = uuid4()
-        return self._repository.add(email=f"{uid}@email.com", password="pwd")
+    def create_user(self, email: str, password: str, organization_id: int) -> User:
+        # uid = uuid4()
+        # return self._repository.add(email=f"{uid}@email.com", password="pwd")
+        return self._repository.add(email=email, password=password, organization_id=organization_id)
+
+    def login_user(self, email: str, password: str) -> str:
+        return self._repository.login(email=email, password=password)
 
     def delete_user_by_id(self, user_id: int) -> None:
         return self._repository.delete_by_id(user_id)

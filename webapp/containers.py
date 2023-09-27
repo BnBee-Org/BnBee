@@ -3,10 +3,12 @@
 from dependency_injector import containers, providers
 
 from .database import Database
+from .repositories.organizationRepository import OrganizationRepository
 from .repositories.apiaryRepository import ApiaryRepository
 from .repositories.hiveRepository import HiveRepository
 from .repositories.statisticRepository import StatisticRepository
 from .repositories.userRepository import UserRepository
+from .services.organizationService import OrganizationService
 from .services.apiaryService import ApiaryService
 from .services.hiveService import HiveService
 from .services.statisticService import StatisticService
@@ -15,8 +17,8 @@ from .services.userService import UserService
 
 class Container(containers.DeclarativeContainer):
     wiring_config = containers.WiringConfiguration(
-        modules=[".endpoints.statusRouter", ".endpoints.hiveRouter", ".endpoints.usersRouter",
-                 ".endpoints.apiaryRouter", ".endpoints.statisticRouter"])
+        modules=[".endpoints.statusRouter", ".endpoints.organizationRouter", ".endpoints.hiveRouter",
+                 ".endpoints.usersRouter", ".endpoints.apiaryRouter", ".endpoints.statisticRouter"])
 
     config = providers.Configuration(yaml_files=["config.yml"])
 
@@ -60,4 +62,14 @@ class Container(containers.DeclarativeContainer):
     statistic_service = providers.Factory(
         StatisticService,
         statistic_repository=statistic_repository,
+    )
+
+    organization_repository = providers.Factory(
+        OrganizationRepository,
+        session_factory=db.provided.session,
+    )
+
+    organization_service = providers.Factory(
+        OrganizationService,
+        organization_repository=organization_repository,
     )
