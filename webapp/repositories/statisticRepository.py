@@ -1,5 +1,5 @@
 from contextlib import AbstractContextManager
-from datetime import datetime
+from datetime import datetime, timedelta
 from pytz import timezone
 from typing import Callable, Iterator
 
@@ -9,6 +9,8 @@ from sqlalchemy.orm import Session
 from webapp.models.hive import Hive
 from webapp.models.statistics import Statistics
 from webapp.repositories.notFoundError import NotFoundError
+
+STATISTIC_DAYS_BACK = 10
 
 
 class StatisticRepository:
@@ -22,7 +24,9 @@ class StatisticRepository:
 
     def get_by_hive_id(self, hive_id: int) -> Statistics:
         with self.session_factory() as session:
-            stat = session.query(Statistics).filter(Statistics.hive_id == hive_id).all()
+            stat = session.query(Statistics).filter(Statistics.hive_id == hive_id,
+                                                    Statistics.datetime > datetime.today() - timedelta(
+                                                        days=STATISTIC_DAYS_BACK)).all()
             if not stat:
                 raise StatisticsNotFoundError(hive_id)
             return stat
@@ -38,14 +42,23 @@ class StatisticRepository:
                 raise StatisticsNotFoundError(hive_id)
             return stat
 
-    def get_latest_stat_by_apiary(self, apiary_id: int) -> Statistics:
+    def get_latest_stat_by_apiary_id(self, apiary_id: int) -> Statistics:
         with self.session_factory() as session:
-            stat = session.query(Statistics, func.max(Statistics.datetime))\
-                .group_by(Statistics.hive_id)\
+            stat = session.query(Statistics, func.max(Statistics.datetime)) \
+                .group_by(Statistics.hive_id) \
                 .join(Hive).filter(Statistics.hive_id == Hive.id, Hive.apiary_id == apiary_id).all()
 
             if not stat:
                 raise StatisticsNotFoundError(apiary_id)
+            return stat
+
+    def get_latest_stat_by_hive_id(self, hive_id: int) -> Statistics:
+        with self.session_factory() as session:
+            stat = session.query(Statistics, func.max(Statistics.datetime)) \
+                .group_by(Statistics.hive_id).filter(Statistics.hive_id == hive_id).all()
+
+            if not stat:
+                raise StatisticsNotFoundError(hive_id)
             return stat
 
     def add(self, hive_id: int, temperature: float, humidity: float, weight: float, avr_sound: float,
