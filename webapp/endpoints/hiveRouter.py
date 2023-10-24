@@ -9,7 +9,7 @@ from webapp.services.hiveService import HiveService
 hive_router = APIRouter()
 
 
-@hive_router.get("/hives")
+@hive_router.get("/hives", dependencies=[Depends(JWTBearer())],)
 @inject
 def get_list(
         hive_service: HiveService = Depends(Provide[Container.hive_service]),
@@ -17,7 +17,7 @@ def get_list(
     return hive_service.get_hives()
 
 
-@hive_router.get("/hives/{hive_id}")
+@hive_router.get("/hives/{hive_id}", dependencies=[Depends(JWTBearer())])
 @inject
 def get_by_id(
         hive_id: int,
@@ -29,16 +29,7 @@ def get_by_id(
         return Response(status_code=status.HTTP_404_NOT_FOUND)
 
 
-# @hive_router.post("/hives/login", tags=["user"])
-# async def user_login(email: str):
-#     if True:
-#         return signJWT(email)
-#     return {
-#         "error": "Wrong login details!"
-#     }
-
-
-@hive_router.post("/hives", status_code=status.HTTP_201_CREATED)
+@hive_router.post("/hives", dependencies=[Depends(JWTBearer())], status_code=status.HTTP_201_CREATED)
 @inject
 def add(
         hive_name: str,
@@ -50,7 +41,7 @@ def add(
     return hive_service.create_hive(hive_name, is_active, apiary_id, user)
 
 
-@hive_router.patch("/hives/{hive_id}", status_code=status.HTTP_201_CREATED)
+@hive_router.patch("/hives/{hive_id}", dependencies=[Depends(JWTBearer())], status_code=status.HTTP_201_CREATED)
 @inject
 def update(
         hive_id: int,
@@ -68,7 +59,7 @@ def update(
                                     apiary_id, status)
 
 
-@hive_router.delete("/hives/{hive_id}", status_code=status.HTTP_204_NO_CONTENT)
+@hive_router.delete("/hives/{hive_id}", dependencies=[Depends(JWTBearer())], status_code=status.HTTP_204_NO_CONTENT)
 @inject
 def remove(
         hive_id: int,

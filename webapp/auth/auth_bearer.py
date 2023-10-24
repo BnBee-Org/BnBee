@@ -22,5 +22,5 @@ class JWTBearer(HTTPBearer):
         try:
             payload = decode_jwt(jwt_token)
             return payload['email']
-        except:
+        except Exception:
             raise HTTPException(status_code=403, detail="Invalid token or expired token.")

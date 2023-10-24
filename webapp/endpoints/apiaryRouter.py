@@ -9,7 +9,7 @@ from webapp.services.apiaryService import ApiaryService
 apiary_router = APIRouter()
 
 
-@apiary_router.get("/apiaries")
+@apiary_router.get("/apiaries", dependencies=[Depends(JWTBearer())])
 @inject
 def get_list(
         user: str = Depends(JWTBearer()),
@@ -18,7 +18,7 @@ def get_list(
     return apiary_service.get_apiaries(user)
 
 
-@apiary_router.get("/apiaries/{apiary_id}")
+@apiary_router.get("/apiaries/{apiary_id}", dependencies=[Depends(JWTBearer())])
 @inject
 def get_by_id(
         apiary_id: int,
@@ -31,7 +31,7 @@ def get_by_id(
         return Response(status_code=status.HTTP_404_NOT_FOUND)
 
 
-@apiary_router.post("/apiaries", status_code=status.HTTP_201_CREATED)
+@apiary_router.post("/apiaries", dependencies=[Depends(JWTBearer())], status_code=status.HTTP_201_CREATED)
 @inject
 def add(
         apiary_name: str,
@@ -41,7 +41,7 @@ def add(
     return apiary_service.create_apiary(apiary_name, user)
 
 
-@apiary_router.patch("/apiaries/{apiary_id}", status_code=status.HTTP_201_CREATED)
+@apiary_router.patch("/apiaries/{apiary_id}", dependencies=[Depends(JWTBearer())], status_code=status.HTTP_201_CREATED)
 @inject
 def update(
         apiary_id: int,
@@ -52,7 +52,7 @@ def update(
     return apiary_service.update_apiary(apiary_id, apiary_name, user)
 
 
-@apiary_router.delete("/apiaries/{apiary_id}", status_code=status.HTTP_204_NO_CONTENT)
+@apiary_router.delete("/apiaries/{apiary_id}", dependencies=[Depends(JWTBearer())], status_code=status.HTTP_204_NO_CONTENT)
 @inject
 def remove(
         apiary_id: int,
