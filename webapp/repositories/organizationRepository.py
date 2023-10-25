@@ -1,6 +1,6 @@
 from contextlib import AbstractContextManager
 from datetime import datetime
-from typing import Callable, Iterator
+from typing import Callable
 
 from sqlalchemy.orm import Session
 
@@ -28,10 +28,6 @@ class OrganizationRepository:
                 raise OrganizationNotFoundError(organization_id)
             session.delete(entity)
             session.commit()
-
-
-class OrganizationNotFoundError(NotFoundError):
-    entity_name: str = "Organization"
 
 
 class OrganizationNotFoundError(NotFoundError):

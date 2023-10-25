@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends, Response, status
 from dependency_injector.wiring import inject, Provide
 
+from webapp.auth.auth_bearer import JWTBearer
 from webapp.containers import Container
 from webapp.repositories.notFoundError import NotFoundError
 from webapp.services.organizationService import OrganizationService
@@ -8,7 +9,7 @@ from webapp.services.organizationService import OrganizationService
 organization_router = APIRouter()
 
 
-@organization_router.post("/organizations", status_code=status.HTTP_201_CREATED)
+@organization_router.post("/organizations", dependencies=[Depends(JWTBearer())], status_code=status.HTTP_201_CREATED)
 @inject
 def add(
         organization_name: str,
@@ -17,7 +18,7 @@ def add(
     return organization_service.create_organization(organization_name)
 
 
-@organization_router.delete("/organizations/{organization_id}", status_code=status.HTTP_204_NO_CONTENT)
+@organization_router.delete("/organizations/{organization_id}", dependencies=[Depends(JWTBearer())], status_code=status.HTTP_204_NO_CONTENT)
 @inject
 def remove(
         organization_id: int,
