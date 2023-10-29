@@ -14,8 +14,9 @@ user_router = APIRouter()
 @inject
 def get_list(
         user_service: UserService = Depends(Provide[Container.user_service]),
+        logged_user_email: str = Depends(JWTBearer()),
 ):
-    return user_service.get_users()
+    return user_service.get_users(logged_user_email)
 
 
 @user_router.get("/users/{user_id}", dependencies=[Depends(JWTBearer())])
@@ -23,9 +24,10 @@ def get_list(
 def get_by_id(
         user_id: int,
         user_service: UserService = Depends(Provide[Container.user_service]),
+        logged_user_email: str = Depends(JWTBearer()),
 ):
     try:
-        return user_service.get_user_by_id(user_id)
+        return user_service.get_user_by_id(user_id,logged_user_email)
     except NotFoundError:
         return Response(status_code=status.HTTP_404_NOT_FOUND)
 
@@ -38,7 +40,8 @@ def add(
         organization_id: int,
         user_service: UserService = Depends(Provide[Container.user_service]),
 ):
-    return user_service.create_user(email, password, organization_id)
+    return user_service.create_user( email=email, password=password,
+                                    organization_id=organization_id)
 
 
 @user_router.post("/users/login", status_code=status.HTTP_200_OK)
@@ -56,9 +59,10 @@ def login(
 def remove(
         user_id: int,
         user_service: UserService = Depends(Provide[Container.user_service]),
+        logged_user_email: str = Depends(JWTBearer()),
 ):
     try:
-        user_service.delete_user_by_id(user_id)
+        user_service.delete_user_by_id(user_id,logged_user_email)
     except NotFoundError:
         return Response(status_code=status.HTTP_404_NOT_FOUND)
     else:
