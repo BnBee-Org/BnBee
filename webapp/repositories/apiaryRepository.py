@@ -16,14 +16,14 @@ class ApiaryRepository:
     def get_all(self, email: str) -> Iterator[Apiary]:
         with self.session_factory() as session:
             user = session.query(User).filter(User.email == email).first()
-            return session.query(Apiary).filter(Apiary.id == user.organization_id).all()
+            return session.query(Apiary).filter(Apiary.organization_id == user.organization_id).all()
 
     def get_by_id(self, apiary_id: int, email: str) -> Apiary:
         with self.session_factory() as session:
             user = session.query(User).filter(User.email == email).first()
             apiary = session.query(Apiary).filter(
-                Apiary.id == apiary_id and Apiary.organization_id == user.organization_id).first()
-            if not apiary:
+                Apiary.id == apiary_id, Apiary.organization_id == user.organization_id).first()
+            if not apiary :
                 raise ApiaryNotFoundError(apiary_id)
             return apiary
 
@@ -36,9 +36,9 @@ class ApiaryRepository:
             session.refresh(apiary)
             return apiary
 
-    def update(self, apiary_id: int, name: str, email: str) -> Apiary:
+    def update(self, apiary_id: int, name: str, user_email: str) -> Apiary:
         with self.session_factory() as session:
-            user = session.query(User).filter(User.email == email).first()
+            user = session.query(User).filter(User.email == user_email).first()
             apiary = session.get(Apiary, apiary_id)
             if not apiary or apiary.organization_id != user.organization_id:
                 raise ApiaryNotFoundError(apiary_id)
