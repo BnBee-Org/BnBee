@@ -19,7 +19,7 @@ class Hive(Base):
 
     def __repr__(self):
         return f"<Hive(id={self.id}, " \
-               f"name=\"{self.email}\", " \
+               f"name=\"{self.name}\", " \
                f"bee_count=\"{self.bee_count}\", " \
                f"is_active=\"{self.is_active}\", " \
                f"lid_open=\"{self.lid_open}\", " \

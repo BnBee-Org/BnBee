@@ -9,12 +9,13 @@ from webapp.services.hiveService import HiveService
 hive_router = APIRouter()
 
 
-@hive_router.get("/hives", dependencies=[Depends(JWTBearer())],)
+@hive_router.get("/hives", dependencies=[Depends(JWTBearer())], )
 @inject
 def get_list(
         hive_service: HiveService = Depends(Provide[Container.hive_service]),
+        user_email: str = Depends(JWTBearer()),
 ):
-    return hive_service.get_hives()
+    return hive_service.get_hives(user_email)
 
 
 @hive_router.get("/hives/{hive_id}", dependencies=[Depends(JWTBearer())])
@@ -22,9 +23,10 @@ def get_list(
 def get_by_id(
         hive_id: int,
         hive_service: HiveService = Depends(Provide[Container.hive_service]),
+        user_email: str = Depends(JWTBearer()),
 ):
     try:
-        return hive_service.get_hive_by_id(hive_id)
+        return hive_service.get_hive_by_id(hive_id, user_email=user_email)
     except NotFoundError:
         return Response(status_code=status.HTTP_404_NOT_FOUND)
 
@@ -35,10 +37,10 @@ def add(
         hive_name: str,
         is_active: bool,
         apiary_id: int,
-        user: str = Depends(JWTBearer()),
+        user_email: str = Depends(JWTBearer()),
         hive_service: HiveService = Depends(Provide[Container.hive_service]),
 ):
-    return hive_service.create_hive(hive_name, is_active, apiary_id, user)
+    return hive_service.create_hive(hive_name, is_active, apiary_id, user_email)
 
 
 @hive_router.patch("/hives/{hive_id}", dependencies=[Depends(JWTBearer())], status_code=status.HTTP_201_CREATED)
@@ -54,9 +56,10 @@ def update(
         status: bool | None = None,
         hive_name: str | None = None,
         hive_service: HiveService = Depends(Provide[Container.hive_service]),
+        user_email: str = Depends(JWTBearer()),
 ):
     return hive_service.update_hive(hive_id, hive_name, bee_count, is_active, lid_open, door_open, maintenance,
-                                    apiary_id, status)
+                                    apiary_id, status,user_email)
 
 
 @hive_router.delete("/hives/{hive_id}", dependencies=[Depends(JWTBearer())], status_code=status.HTTP_204_NO_CONTENT)
@@ -64,9 +67,10 @@ def update(
 def remove(
         hive_id: int,
         hive_service: HiveService = Depends(Provide[Container.hive_service]),
+        user_email: str = Depends(JWTBearer()),
 ):
     try:
-        hive_service.delete_hive_by_id(hive_id)
+        hive_service.delete_hive_by_id(hive_id=hive_id, user_email=user_email)
     except NotFoundError:
         return Response(status_code=status.HTTP_404_NOT_FOUND)
     else:
