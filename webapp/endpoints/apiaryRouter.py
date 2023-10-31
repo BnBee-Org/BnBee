@@ -1,5 +1,5 @@
-from fastapi import APIRouter, Depends, Response, status
 from dependency_injector.wiring import inject, Provide
+from fastapi import APIRouter, Depends, Response, status
 
 from webapp.auth.auth_bearer import JWTBearer
 from webapp.containers import Container
@@ -53,7 +53,8 @@ def update(
     return apiary_service.update_apiary(apiary_id, apiary_name, user)
 
 
-@apiary_router.delete("/apiaries/{apiary_id}", dependencies=[Depends(JWTBearer())], status_code=status.HTTP_204_NO_CONTENT)
+@apiary_router.delete("/apiaries/{apiary_id}", dependencies=[Depends(JWTBearer())],
+                      status_code=status.HTTP_204_NO_CONTENT)
 @inject
 def remove(
         apiary_id: int,

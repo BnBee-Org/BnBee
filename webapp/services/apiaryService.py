@@ -15,7 +15,6 @@ class ApiaryService:
     def get_apiary_by_id(self, apiary_id: int, user: str) -> Apiary:
         return self._repository.get_by_id(apiary_id, user)
 
-
     def create_apiary(self, apiary_name: str, user_email: str) -> Apiary:
         return self._repository.add(name=apiary_name, email=user_email)
 

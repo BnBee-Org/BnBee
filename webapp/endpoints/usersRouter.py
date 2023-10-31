@@ -1,5 +1,5 @@
-from fastapi import APIRouter, Depends, Response, status
 from dependency_injector.wiring import inject, Provide
+from fastapi import APIRouter, Depends, Response, status
 
 from webapp.auth.auth_bearer import JWTBearer
 from webapp.auth.auth_handler import sign_jwt
@@ -27,7 +27,7 @@ def get_by_id(
         logged_user_email: str = Depends(JWTBearer()),
 ):
     try:
-        return user_service.get_user_by_id(user_id,logged_user_email)
+        return user_service.get_user_by_id(user_id, logged_user_email)
     except NotFoundError:
         return Response(status_code=status.HTTP_404_NOT_FOUND)
 
@@ -40,7 +40,7 @@ def add(
         organization_id: int,
         user_service: UserService = Depends(Provide[Container.user_service]),
 ):
-    return user_service.create_user( email=email, password=password,
+    return user_service.create_user(email=email, password=password,
                                     organization_id=organization_id)
 
 
@@ -62,7 +62,7 @@ def remove(
         logged_user_email: str = Depends(JWTBearer()),
 ):
     try:
-        user_service.delete_user_by_id(user_id,logged_user_email)
+        user_service.delete_user_by_id(user_id, logged_user_email)
     except NotFoundError:
         return Response(status_code=status.HTTP_404_NOT_FOUND)
     else:

@@ -1,9 +1,9 @@
-from fastapi import APIRouter, Depends, Response, status
 from dependency_injector.wiring import inject, Provide
+from fastapi import APIRouter, Depends, Response, status
+
 from webapp.auth.auth_bearer import JWTBearer
 from webapp.containers import Container
 from webapp.repositories.notFoundError import NotFoundError
-
 from webapp.services.hiveService import HiveService
 
 hive_router = APIRouter()
@@ -59,7 +59,7 @@ def update(
         user_email: str = Depends(JWTBearer()),
 ):
     return hive_service.update_hive(hive_id, hive_name, bee_count, is_active, lid_open, door_open, maintenance,
-                                    apiary_id, status,user_email)
+                                    apiary_id, status, user_email)
 
 
 @hive_router.delete("/hives/{hive_id}", dependencies=[Depends(JWTBearer())], status_code=status.HTTP_204_NO_CONTENT)

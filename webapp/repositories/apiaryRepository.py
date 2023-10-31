@@ -23,7 +23,7 @@ class ApiaryRepository:
             user = session.query(User).filter(User.email == email).first()
             apiary = session.query(Apiary).filter(
                 Apiary.id == apiary_id, Apiary.organization_id == user.organization_id).first()
-            if not apiary :
+            if not apiary:
                 raise ApiaryNotFoundError(apiary_id)
             return apiary
 

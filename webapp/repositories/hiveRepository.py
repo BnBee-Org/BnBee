@@ -1,5 +1,5 @@
 from contextlib import AbstractContextManager
-from typing import Callable, Iterator
+from typing import Callable
 
 from sqlalchemy.orm import Session
 
@@ -47,7 +47,7 @@ class HiveRepository:
             user = session.query(User).filter(User.email == user_email).first()
             hive = session.get(Hive, hive_id)
             if not hive or hive.organization_id != user.organization_id:
-                raise UserHaveNoPermision(user.id)
+                raise HiveNotFoundError(hive_id)
             hive.name = name
             hive.bee_count = bee_count
             hive.is_active = is_active
@@ -78,7 +78,3 @@ class HiveNotFoundError(NotFoundError):
 
 class ApiaryNotFoundError(NotFoundError):
     entity_name: str = "Apiary"
-
-
-class UserHaveNoPermision(NotFoundError):
-    entity_name: str = "User"
