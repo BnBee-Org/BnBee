@@ -46,7 +46,6 @@ def add(
 def update(
         apiary_id: int,
         apiary_name: str,
-
         user: str = Depends(JWTBearer()),
         apiary_service: ApiaryService = Depends(Provide[Container.apiary_service]),
 ):
