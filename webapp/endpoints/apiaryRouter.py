@@ -1,5 +1,5 @@
-from fastapi import APIRouter, Depends, Response, status
 from dependency_injector.wiring import inject, Provide
+from fastapi import APIRouter, Depends, Response, status
 
 from webapp.auth.auth_bearer import JWTBearer
 from webapp.containers import Container
@@ -12,10 +12,10 @@ apiary_router = APIRouter()
 @apiary_router.get("/apiaries", dependencies=[Depends(JWTBearer())])
 @inject
 def get_list(
-        user: str = Depends(JWTBearer()),
+        user_email: str = Depends(JWTBearer()),
         apiary_service: ApiaryService = Depends(Provide[Container.apiary_service]),
 ):
-    return apiary_service.get_apiaries(user)
+    return apiary_service.get_apiaries(user_email)
 
 
 @apiary_router.get("/apiaries/{apiary_id}", dependencies=[Depends(JWTBearer())])
@@ -35,10 +35,10 @@ def get_by_id(
 @inject
 def add(
         apiary_name: str,
-        user: str = Depends(JWTBearer()),
+        user_email: str = Depends(JWTBearer()),
         apiary_service: ApiaryService = Depends(Provide[Container.apiary_service]),
 ):
-    return apiary_service.create_apiary(apiary_name, user)
+    return apiary_service.create_apiary(apiary_name, user_email)
 
 
 @apiary_router.patch("/apiaries/{apiary_id}", dependencies=[Depends(JWTBearer())], status_code=status.HTTP_201_CREATED)
@@ -52,15 +52,16 @@ def update(
     return apiary_service.update_apiary(apiary_id, apiary_name, user)
 
 
-@apiary_router.delete("/apiaries/{apiary_id}", dependencies=[Depends(JWTBearer())], status_code=status.HTTP_204_NO_CONTENT)
+@apiary_router.delete("/apiaries/{apiary_id}", dependencies=[Depends(JWTBearer())],
+                      status_code=status.HTTP_204_NO_CONTENT)
 @inject
 def remove(
         apiary_id: int,
-        user: str = Depends(JWTBearer()),
+        user_email: str = Depends(JWTBearer()),
         apiary_service: ApiaryService = Depends(Provide[Container.apiary_service]),
 ):
     try:
-        apiary_service.delete_apiary_by_id(apiary_id, user)
+        apiary_service.delete_apiary_by_id(apiary_id, user_email)
     except NotFoundError:
         return Response(status_code=status.HTTP_404_NOT_FOUND)
     else:
