@@ -7,6 +7,7 @@ from webapp.database import Base
 
 class User(Base):
     __tablename__ = "users"
+    is_admin = Column(Boolean, default=False)
     id = Column(Integer, primary_key=True)
     organization_id = Column(Integer, ForeignKey('organization.id'))
     email = Column(String, unique=True)

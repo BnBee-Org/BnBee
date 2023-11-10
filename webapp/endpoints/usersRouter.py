@@ -32,16 +32,18 @@ def get_by_id(
         return Response(status_code=status.HTTP_404_NOT_FOUND)
 
 
-@user_router.post("/users", status_code=status.HTTP_201_CREATED)
+@user_router.post("/users", status_code=status.HTTP_201_CREATED, tags=['admin'])
 @inject
 def add(
         email: str,
         password: str,
         organization_id: int,
         user_service: UserService = Depends(Provide[Container.user_service]),
+        logged_user_email: str = Depends(JWTBearer()),
 ):
     return user_service.create_user(email=email, password=password,
-                                    organization_id=organization_id)
+                                    organization_id=organization_id,
+                                    logged_user_email=logged_user_email)
 
 
 @user_router.post("/users/login", status_code=status.HTTP_200_OK)
@@ -54,7 +56,8 @@ def login(
     return sign_jwt(user_service.login_user(email, password))
 
 
-@user_router.delete("/users/{user_id}", status_code=status.HTTP_204_NO_CONTENT, dependencies=[Depends(JWTBearer())])
+@user_router.delete("/users/{user_id}", status_code=status.HTTP_204_NO_CONTENT, dependencies=[Depends(JWTBearer())],
+                    tags=['admin'])
 @inject
 def remove(
         user_id: int,

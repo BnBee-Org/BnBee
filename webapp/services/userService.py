@@ -16,10 +16,11 @@ class UserService:
     def get_user_by_id(self, user_id: int, logged_user_email: str) -> User:
         return self._repository.get_by_id(user_id, logged_user_email)
 
-    def create_user(self, email: str, password: str, organization_id: int) -> User:
+    def create_user(self, email: str, password: str, organization_id: int, logged_user_email: str) -> User:
         # uid = uuid4()
         # return self._repository.add(email=f"{uid}@email.com", password="pwd")
-        return self._repository.add(email=email, password=password, organization_id=organization_id)
+        return self._repository.add(logged_user_email=logged_user_email,
+                                    email=email, password=password, organization_id=organization_id)
 
     def login_user(self, email: str, password: str) -> str:
         return self._repository.login(email=email, password=password)

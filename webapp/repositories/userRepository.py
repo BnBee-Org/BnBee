@@ -29,10 +29,13 @@ class UserRepository:
                 raise HTTPException(status_code=404, detail="User not found.")
             return user
 
-    def add(self, email: str, password: str, organization_id: int,
+    def add(self, logged_user_email: str, email: str, password: str, organization_id: int,
             is_active: bool = True) -> User:
         with self.session_factory() as session:
             organization = session.query(Organization).filter(Organization.id == organization_id).first()
+            logged_user= session.query(User).filter(User.email == logged_user_email).first()
+            if not logged_user.is_admin:
+                raise HTTPException(status_code=403, detail="You are not admin.")
             if not organization:
                 raise HTTPException(status_code=404, detail="Organization not found.")
             user = User(email=email, hashed_password=self.get_password_hash(password), organization_id=organization_id,
@@ -55,6 +58,8 @@ class UserRepository:
     def delete_by_id(self, user_id: int, user_email) -> None:
         with self.session_factory() as session:
             logged_user = session.query(User).filter(User.email == user_email).first()
+            if not logged_user.is_admin:
+                raise HTTPException(status_code=403, detail="You are not admin.")
             entity: User = session.query(User).filter(
                 User.id == user_id, User.organization_id == logged_user.organization_id).first()
             if not entity:
