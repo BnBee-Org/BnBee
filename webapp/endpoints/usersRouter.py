@@ -1,5 +1,5 @@
 from dependency_injector.wiring import inject, Provide
-from fastapi import APIRouter, Depends, Response, status
+from fastapi import APIRouter, Depends, Response, status, Request
 
 from webapp.auth.auth_bearer import JWTBearer
 from webapp.auth.auth_handler import sign_jwt
@@ -32,18 +32,21 @@ def get_by_id(
         return Response(status_code=status.HTTP_404_NOT_FOUND)
 
 
-@user_router.post("/users", status_code=status.HTTP_201_CREATED, tags=['admin'])
+@user_router.post("/users", status_code=status.HTTP_201_CREATED, dependencies=[Depends(JWTBearer())], tags=['admin'])
 @inject
 def add(
+        request: Request,
         email: str,
         password: str,
         organization_id: int,
-        user_service: UserService = Depends(Provide[Container.user_service]),
         logged_user_email: str = Depends(JWTBearer()),
+        user_service: UserService = Depends(Provide[Container.user_service]),
+
 ):
     return user_service.create_user(email=email, password=password,
-                                    organization_id=organization_id,
-                                    logged_user_email=logged_user_email)
+                                    organization_id=organization_id, logged_user_email=logged_user_email,
+                                    user_ip=request.client.host
+                                    )
 
 
 @user_router.post("/users/login", status_code=status.HTTP_200_OK)
@@ -60,12 +63,14 @@ def login(
                     tags=['admin'])
 @inject
 def remove(
+        request: Request,
         user_id: int,
         user_service: UserService = Depends(Provide[Container.user_service]),
         logged_user_email: str = Depends(JWTBearer()),
 ):
     try:
-        user_service.delete_user_by_id(user_id, logged_user_email)
+        user_service.delete_user_by_id(user_id=user_id, logged_user_email=logged_user_email,
+                                       user_ip=request.client.host)
     except NotFoundError:
         return Response(status_code=status.HTTP_404_NOT_FOUND)
     else:
