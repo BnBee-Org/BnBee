@@ -5,8 +5,10 @@ from fastapi import HTTPException
 from passlib.context import CryptContext
 from sqlalchemy.orm import Session
 
+from webapp.auth.whitelistHandler import check_user_ip
 from webapp.models.organizations import Organization
 from webapp.models.user import User
+from webapp.models.whitelist import Whitelist
 
 
 class UserRepository:
@@ -29,10 +31,17 @@ class UserRepository:
                 raise HTTPException(status_code=404, detail="User not found.")
             return user
 
-    def add(self, email: str, password: str, organization_id: int,
+    def add(self, logged_user_email: str, user_ip: str, email: str, password: str, organization_id: int,
             is_active: bool = True) -> User:
         with self.session_factory() as session:
             organization = session.query(Organization).filter(Organization.id == organization_id).first()
+            logged_user = session.query(User).filter(User.email == logged_user_email).first()
+            ip_whitelist = session.query(Whitelist.ip_range).filter(Whitelist.user_id == logged_user.id).all()
+            if not logged_user.is_admin:
+                raise HTTPException(status_code=403, detail="You are not admin.")
+            if check_user_ip(user_ip=user_ip, ip_whitelist=ip_whitelist) == False:
+                raise HTTPException(status_code=403,
+                                    detail=" You do not have the required permissions to access this resource from your current IP address.")
             if not organization:
                 raise HTTPException(status_code=404, detail="Organization not found.")
             user = User(email=email, hashed_password=self.get_password_hash(password), organization_id=organization_id,
@@ -52,9 +61,15 @@ class UserRepository:
             else:
                 raise HTTPException(status_code=403, detail="Invalid authentication scheme.")
 
-    def delete_by_id(self, user_id: int, user_email) -> None:
+    def delete_by_id(self, user_id: int, logged_user_email: str, user_ip) -> None:
         with self.session_factory() as session:
-            logged_user = session.query(User).filter(User.email == user_email).first()
+            logged_user = session.query(User).filter(User.email == logged_user_email).first()
+            ip_whitelist = session.query(Whitelist.ip_range).filter(Whitelist.user_id == logged_user.id).all()
+            if not logged_user.is_admin:
+                raise HTTPException(status_code=403, detail="You are not admin.")
+            if check_user_ip(user_ip=user_ip, ip_whitelist=ip_whitelist) == False:
+                raise HTTPException(status_code=403,
+                                    detail=" You do not have the required permissions to access this resource from your current IP address.")
             entity: User = session.query(User).filter(
                 User.id == user_id, User.organization_id == logged_user.organization_id).first()
             if not entity:
