@@ -32,7 +32,8 @@ def get_by_id(
         return Response(status_code=status.HTTP_404_NOT_FOUND)
 
 
-@user_router.post("/users", status_code=status.HTTP_201_CREATED, dependencies=[Depends(JWTBearer())], tags=['admin'])
+@user_router.post("/users", status_code=status.HTTP_201_CREATED, dependencies=[Depends(JWTBearer())], tags=['admin'],
+                  include_in_schema=False)
 @inject
 def add(
         request: Request,
@@ -60,7 +61,7 @@ def login(
 
 
 @user_router.delete("/users/{user_id}", status_code=status.HTTP_204_NO_CONTENT, dependencies=[Depends(JWTBearer())],
-                    tags=['admin'])
+                    tags=['admin'], include_in_schema=False)
 @inject
 def remove(
         request: Request,

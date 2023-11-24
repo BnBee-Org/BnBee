@@ -9,7 +9,8 @@ from webapp.services.organizationService import OrganizationService
 organization_router = APIRouter()
 
 
-@organization_router.post("/organizations", status_code=status.HTTP_201_CREATED, tags=['admin'])
+@organization_router.post("/organizations", status_code=status.HTTP_201_CREATED, tags=['admin'],
+                          include_in_schema=False)
 @inject
 def add(
         request: Request,
@@ -21,7 +22,8 @@ def add(
                                                     logged_user_email=logged_user_email, user_ip=request.client.host)
 
 
-@organization_router.delete("/organizations/{organization_id}", status_code=status.HTTP_204_NO_CONTENT, tags=['admin'])
+@organization_router.delete("/organizations/{organization_id}", status_code=status.HTTP_204_NO_CONTENT, tags=['admin'],
+                            include_in_schema=False)
 @inject
 def remove(
         request: Request,
